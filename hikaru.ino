@@ -9,6 +9,8 @@
 #define NUM_PIXELS PER_SEGMENT * NUM_SEGMENTS
 #define PER_SIDE NUM_PIXELS / 2
 
+#define BRIGHTNESS 25
+
 Adafruit_NeoPixel pixels(NUM_PIXELS, STRIP, NEO_GRB + NEO_KHZ800);
 
 enum FIELD_STATE {
@@ -25,6 +27,23 @@ int enabled;
 
 int state = IDLE;
 
+void ledSetAll(uint8_t r, uint8_t g, uint8_t b){
+  for(uint16_t i = 0; i < NUM_PIXELS; i++){
+    pixels.setPixelColor(i, r, g, b);
+  }
+  pixels.show();
+}
+
+void ledSetHalves(uint8_t r1, uint8_t g1, uint8_t b1, uint8_t r2, uint8_t g2, uint8_t b2){
+  for(uint16_t i = 0; i < PER_SIDE; i++){
+    pixels.setPixelColor(i, r1, g1, b1);
+  }
+  for(uint16_t i = PER_SIDE; i < NUM_PIXELS; i++){
+    pixels.setPixelColor(i, r2, g2, b2);
+  }
+  pixels.show();
+}
+
 void makeDriver() {
   Serial.println("Entering driver control");
   state = DRIVER;
@@ -36,27 +55,23 @@ void makeScoring(){
 }
 
 void makeSkills(){
-  Serial.println("Skills started");
   state = ROBOT_SKILLS;
 }
 
 void makeAuto(){
-  Serial.println("Entering auto");
   state = AUTO;
 }
 
 void makeEndMatch(){
-  Serial.println("Match ended");
   state = END_MATCH;
 }
 
 void makeIdle(){
-  Serial.println("Returning to idle");
+  ledSetAll(255, 255, 255);
   state = IDLE;
 }
 
 void confusedDefault(){
-  Serial.println("No idea what just happened");
   makeIdle();
 }
 
@@ -106,12 +121,8 @@ void setup(){
   pinMode(DRIVER_nAUTON, INPUT);
   pinMode(ENABLE, INPUT);
   pixels.begin();
-  pixels.setBrightness(50);
-  Serial.begin(9600);
-  Serial.println("Hello world");
-  pixels.setPixelColor(0, 0, 255, 0);
-  pixels.setPixelColor(1, 0, 0, 255);
-  pixels.show();
+  pixels.setBrightness(BRIGHTNESS);
+  makeIdle();
 }
 
 void loop() {
