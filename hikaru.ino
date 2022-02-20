@@ -1,5 +1,15 @@
+#include <Adafruit_NeoPixel.h>
+
 #define DRIVER_nAUTON 7
 #define ENABLE 6
+#define STRIP 5
+
+#define PER_SEGMENT 1
+#define NUM_SEGMENTS 2
+#define NUM_PIXELS PER_SEGMENT * NUM_SEGMENTS
+#define PER_SIDE NUM_PIXELS / 2
+
+Adafruit_NeoPixel pixels(NUM_PIXELS, STRIP, NEO_GRB + NEO_KHZ800);
 
 enum FIELD_STATE {
   IDLE,
@@ -95,8 +105,13 @@ void stateScoring(){
 void setup(){
   pinMode(DRIVER_nAUTON, INPUT);
   pinMode(ENABLE, INPUT);
+  pixels.begin();
+  pixels.setBrightness(50);
   Serial.begin(9600);
   Serial.println("Hello world");
+  pixels.setPixelColor(0, 0, 255, 0);
+  pixels.setPixelColor(1, 0, 0, 255);
+  pixels.show();
 }
 
 void loop() {
